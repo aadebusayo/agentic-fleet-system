@@ -1,6 +1,6 @@
 # Agent Platform Monorepo
 
-Production-grade, domain-agnostic boilerplate for an enterprise multi-agent cognitive platform.
+Production-grade, domain-agnostic boilerplate for an enterprise multi-agent cognitive platform. Ready to Go.
 
 ## Repository Layout
 
