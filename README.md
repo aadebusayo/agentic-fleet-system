@@ -19,6 +19,7 @@ agent-platform/
 ## Core Platform Capabilities
 
 - Backend orchestrator with intent extraction, slot filling, planner, and fleet routing.
+- Built-in evaluation engine with intent accuracy, latency profiling, token efficiency, tool routing, and guardrail compliance metrics.
 - Control plane with policy enforcement, budget/rate limits, operation proxy, and audit logs.
 - Agent fleet supervisor with registration, capability assignment, delegation limits, and health checks.
 - Sandboxed execution layer with controlled tool calling and recursive sub-agent stubs.
@@ -80,7 +81,7 @@ docker compose -f docker-compose.local.yml down
 
 ## Service Summary
 
-- `backend`: orchestration and workflow planning.
+- `backend`: orchestration, workflow planning, and evaluation/model performance.
 - `control-plane`: enforcement boundary for policies, auth, and operations.
 - `agent-fleet`: runtime registry and fleet lifecycle controls.
 - `sandbox-agent`: constrained execution shim for task-specific agents.
@@ -102,6 +103,41 @@ The platform is intentionally domain-agnostic. Domain packs can add:
 - Delegation recursion and execution caps enforced by fleet supervisor.
 - Tool execution exclusively proxied through control plane.
 - End-to-end trace IDs and auditable event records.
+
+## Evaluation & Model Performance
+
+The evaluation engine lives inside the backend and runs directly against the orchestrator pipeline — no network hop needed.
+
+### Built-in Suites
+
+| Suite | What it measures |
+|---|---|
+| `intent` | Intent classification accuracy |
+| `guardrail` | Guardrail enforcement behaviour |
+| `routing` | Capability routing correctness |
+| `regression` | Full combined regression |
+
+### Endpoints
+
+- `GET /eval/suites` — list available built-in suites.
+- `POST /eval/suite/{name}` — run a built-in suite by name.
+- `POST /eval/run` — run a custom suite with your own cases.
+
+### Metrics Computed
+
+- **Intent accuracy** — exact-match between expected and actual intents.
+- **Latency** — p50/p90/p99/min/max/mean per case.
+- **Token efficiency** — avg/total/min/max token counts.
+- **Tool success rate** — ratio of correctly routed capabilities.
+- **Guardrail compliance** — fraction of cases passing all guardrails.
+
+### Quick Test
+
+```bash
+curl -X POST http://localhost:8080/eval/suite/regression
+```
+
+See `backend/examples/eval-run.example.json` and `shared/schemas/eval-run.schema.json` for the request contract.
 
 ## LLM Layer (Agent Brains)
 

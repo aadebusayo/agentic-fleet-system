@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EvalRunRequest",
+  "description": "Schema for POST /eval/run request body",
+  "type": "object",
+  "required": ["suite_name"],
+  "properties": {
+    "suite_name": {
+      "type": "string",
+      "description": "Name of the evaluation suite"
+    },
+    "model": {
+      "type": "string",
+      "default": "",
+      "description": "LLM model identifier under evaluation"
+    },
+    "provider": {
+      "type": "string",
+      "default": "",
+      "description": "LLM provider name (e.g. openai, anthropic, azure-openai)"
+    },
+    "cases": {
+      "type": "array",
+      "description": "Custom evaluation cases to run",
+      "items": {
+        "type": "object",
+        "required": ["case_id", "input_text"],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "description": "Unique identifier for this evaluation case"
+          },
+          "input_text": {
+            "type": "string",
+            "description": "Input message to evaluate"
+          },
+          "expected_intent": {
+            "type": ["string", "null"],
+            "description": "Expected intent classification result"
+          },
+          "expected_output": {
+            "type": ["string", "null"],
+            "description": "Expected output content"
+          },
+          "expected_tool_calls": {
+            "type": ["array", "null"],
+            "items": { "type": "string" },
+            "description": "Expected tool/capability calls in order"
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": [],
+            "description": "Tags for filtering and grouping results"
+          }
+        }
+      }
+    }
+  }
+}

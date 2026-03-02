@@ -1,0 +1,27 @@
+{
+  "suite_name": "custom-intent-check",
+  "model": "gpt-4o",
+  "provider": "openai",
+  "cases": [
+    {
+      "case_id": "ex-deploy-1",
+      "input_text": "Deploy the billing microservice to production",
+      "expected_intent": "deployment",
+      "expected_tool_calls": ["intent-validation", "policy-precheck", "deploy-execution"],
+      "tags": ["deployment", "billing"]
+    },
+    {
+      "case_id": "ex-analysis-1",
+      "input_text": "Analyze last week's error rate spike",
+      "expected_intent": "analysis",
+      "expected_tool_calls": ["intent-validation", "knowledge-retrieval", "response-synthesis"],
+      "tags": ["analysis", "errors"]
+    },
+    {
+      "case_id": "ex-general-1",
+      "input_text": "What services are currently running?",
+      "expected_intent": "general_assistance",
+      "tags": ["general", "status"]
+    }
+  ]
+}
