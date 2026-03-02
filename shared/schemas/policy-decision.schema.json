@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PolicyDecision",
+  "type": "object",
+  "required": ["allowed", "reason", "traceId", "limits"],
+  "properties": {
+    "allowed": { "type": "boolean" },
+    "reason": { "type": "string" },
+    "traceId": { "type": "string" },
+    "limits": {
+      "type": "object",
+      "required": ["maxOps", "maxBudget"],
+      "properties": {
+        "maxOps": { "type": "integer", "minimum": 1 },
+        "maxBudget": { "type": "number", "minimum": 0 }
+      }
+    }
+  },
+  "additionalProperties": false
+}

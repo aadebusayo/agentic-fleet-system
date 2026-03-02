@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Platform Ops Console</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #0e1117;
+        color: #e7ebf3;
+      }
+      header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #293244;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      nav a {
+        color: #9ecbff;
+        text-decoration: none;
+        margin-right: 16px;
+        font-size: 13px;
+      }
+      .status {
+        font-size: 12px;
+        color: #9fb0c8;
+      }
+      main {
+        padding: 16px 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .panel {
+        border: 1px solid #293244;
+        border-radius: 8px;
+        background: #131a24;
+      }
+      .panel h2 {
+        margin: 0;
+        padding: 12px 14px;
+        border-bottom: 1px solid #293244;
+        font-size: 15px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        text-align: left;
+        border-bottom: 1px solid #253041;
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      .health-healthy { color: #41d392; }
+      .health-degraded { color: #f5b95b; }
+      .health-offline { color: #ff6b6b; }
+      .health-unknown { color: #9fb0c8; }
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      li {
+        border-bottom: 1px solid #253041;
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      .muted { color: #9fb0c8; }
+      .full {
+        grid-column: 1 / span 2;
+      }
+      .flow-wrap {
+        padding: 12px;
+      }
+      svg {
+        width: 100%;
+        height: 220px;
+        background: #0f1520;
+        border-radius: 8px;
+      }
+      .node {
+        fill: #1b2638;
+        stroke: #3b4d68;
+        stroke-width: 1.5;
+      }
+      .node.healthy {
+        stroke: #41d392;
+      }
+      .node.degraded {
+        stroke: #f5b95b;
+      }
+      .node.offline {
+        stroke: #ff6b6b;
+      }
+      .node.pulse {
+        filter: drop-shadow(0 0 10px rgba(62, 190, 255, 0.5));
+      }
+      .edge {
+        stroke: #33465e;
+        stroke-width: 2;
+        fill: none;
+      }
+      .edge.active {
+        stroke: #65b6ff;
+        stroke-width: 3;
+      }
+      .node-label {
+        font-size: 12px;
+        fill: #d9e2f2;
+        text-anchor: middle;
+      }
+      .metric-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        padding: 0 12px 12px 12px;
+      }
+      .metric {
+        border: 1px solid #2a3a50;
+        border-radius: 8px;
+        background: #0f1520;
+        padding: 10px;
+      }
+      .metric strong {
+        display: block;
+        font-size: 20px;
+      }
+      .controls {
+        padding: 12px;
+        display: grid;
+        gap: 10px;
+      }
+      textarea,
+      input,
+      button {
+        border-radius: 6px;
+        border: 1px solid #34445d;
+        background: #0f1520;
+        color: #e7ebf3;
+        padding: 10px;
+        font-size: 13px;
+      }
+      button {
+        cursor: pointer;
+        background: #1c2840;
+      }
+      pre {
+        margin: 0;
+        padding: 10px;
+        border-top: 1px solid #293244;
+        background: #0f1520;
+        font-size: 12px;
+        overflow: auto;
+        max-height: 260px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <strong>Agent Platform – Live Management Overview</strong>
+        <nav>
+          <a href="/ops">Ops View</a>
+          <a href="/chat">User Chat</a>
+          <a href="/chat-admin">Chat Module Manager</a>
+        </nav>
+      </div>
+      <div class="status" id="connection-status">Connecting...</div>
+    </header>
+
+    <main>
+      <section class="panel full">
+        <h2>Execution Flow Graph</h2>
+        <div class="flow-wrap">
+          <svg viewBox="0 0 960 220" role="img" aria-label="Execution flow map">
+            <path id="edge-backend-control-plane" class="edge" d="M180,110 L330,110" />
+            <path id="edge-control-plane-agent-fleet" class="edge" d="M430,110 L580,110" />
+            <path id="edge-agent-fleet-sandbox-agent" class="edge" d="M680,110 L830,110" />
+
+            <rect id="node-backend" class="node" x="40" y="70" rx="10" ry="10" width="140" height="80" />
+            <rect id="node-control-plane" class="node" x="290" y="70" rx="10" ry="10" width="140" height="80" />
+            <rect id="node-agent-fleet" class="node" x="540" y="70" rx="10" ry="10" width="140" height="80" />
+            <rect id="node-sandbox-agent" class="node" x="790" y="70" rx="10" ry="10" width="140" height="80" />
+
+            <text class="node-label" x="110" y="115">backend</text>
+            <text class="node-label" x="360" y="115">control-plane</text>
+            <text class="node-label" x="610" y="115">agent-fleet</text>
+            <text class="node-label" x="860" y="115">sandbox-agent</text>
+          </svg>
+        </div>
+        <div class="metric-row">
+          <div class="metric"><span>Total Events</span><strong id="metric-events">0</strong></div>
+          <div class="metric"><span>Active Agents</span><strong id="metric-agents">0</strong></div>
+          <div class="metric"><span>Healthy Modules</span><strong id="metric-healthy">0</strong></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Module Health</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Health</th>
+              <th>Last Event</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="module-body"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>Active Agents</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Agent ID</th>
+              <th>Module</th>
+              <th>State</th>
+              <th>Trace</th>
+            </tr>
+          </thead>
+          <tbody id="agent-body"></tbody>
+        </table>
+      </section>
+
+      <section class="panel full">
+        <h2>Live Event Timeline</h2>
+        <ul id="event-list"></ul>
+      </section>
+
+      <section class="panel full">
+        <h2>Request Console</h2>
+        <div class="controls">
+          <label for="request-message">Message</label>
+          <textarea id="request-message" rows="3">analyze shipment delays and propose next actions</textarea>
+          <label><input type="checkbox" id="request-confirmed" /> Confirm high-risk operations</label>
+          <button id="send-request">Send to Backend /orchestrate</button>
+        </div>
+        <pre id="request-output">Awaiting request...</pre>
+      </section>
+    </main>
+
+    <script>
+      const moduleBody = document.getElementById("module-body");
+      const agentBody = document.getElementById("agent-body");
+      const eventList = document.getElementById("event-list");
+      const connectionStatus = document.getElementById("connection-status");
+      const requestMessage = document.getElementById("request-message");
+      const requestConfirmed = document.getElementById("request-confirmed");
+      const requestButton = document.getElementById("send-request");
+      const requestOutput = document.getElementById("request-output");
+      const metricEvents = document.getElementById("metric-events");
+      const metricAgents = document.getElementById("metric-agents");
+      const metricHealthy = document.getElementById("metric-healthy");
+
+      const flowEdges = {
+        "backend->control-plane": document.getElementById("edge-backend-control-plane"),
+        "control-plane->agent-fleet": document.getElementById("edge-control-plane-agent-fleet"),
+        "agent-fleet->sandbox-agent": document.getElementById("edge-agent-fleet-sandbox-agent")
+      };
+
+      const moduleOrder = ["backend", "control-plane", "agent-fleet", "sandbox-agent"];
+
+      function clearFlowHighlight() {
+        Object.values(flowEdges).forEach((edge) => edge.classList.remove("active"));
+        moduleOrder.forEach((module) => {
+          const node = document.getElementById(`node-${module}`);
+          if (node) node.classList.remove("pulse");
+        });
+      }
+
+      function pulseModule(module) {
+        clearFlowHighlight();
+        const node = document.getElementById(`node-${module}`);
+        if (node) {
+          node.classList.add("pulse");
+        }
+      }
+
+      function activateEdge(from, to) {
+        const edge = flowEdges[`${from}->${to}`];
+        if (!edge) return;
+        edge.classList.add("active");
+      }
+
+      function renderFlow(snapshot) {
+        moduleOrder.forEach((moduleName) => {
+          const status = snapshot.modules.find((module) => module.module === moduleName);
+          const node = document.getElementById(`node-${moduleName}`);
+          if (!node) return;
+          node.classList.remove("healthy", "degraded", "offline", "unknown");
+          node.classList.add(status ? status.health : "unknown");
+        });
+
+        const latest = snapshot.recentEvents[0];
+        if (latest) {
+          pulseModule(latest.module);
+          const idx = moduleOrder.indexOf(latest.module);
+          if (idx > 0) {
+            activateEdge(moduleOrder[idx - 1], latest.module);
+          }
+        }
+      }
+
+      function row(cells) {
+        const tr = document.createElement("tr");
+        cells.forEach((cell) => {
+          const td = document.createElement("td");
+          if (typeof cell === "string") {
+            td.textContent = cell;
+          } else {
+            td.appendChild(cell);
+          }
+          tr.appendChild(td);
+        });
+        return tr;
+      }
+
+      function renderSnapshot(snapshot) {
+        metricEvents.textContent = String(snapshot.recentEvents.length);
+        metricAgents.textContent = String(snapshot.activeAgents.length);
+        metricHealthy.textContent = String(snapshot.modules.filter((module) => module.health === "healthy").length);
+        renderFlow(snapshot);
+
+        moduleBody.innerHTML = "";
+        snapshot.modules.forEach((module) => {
+          const badge = document.createElement("span");
+          badge.className = `health-${module.health}`;
+          badge.textContent = module.health;
+
+          moduleBody.appendChild(
+            row([
+              module.module,
+              badge,
+              `${module.lastEventType}: ${module.lastEventMessage}`,
+              new Date(module.updatedAt).toLocaleTimeString()
+            ])
+          );
+        });
+
+        agentBody.innerHTML = "";
+        if (snapshot.activeAgents.length === 0) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = '<td colspan="4" class="muted">No active agents</td>';
+          agentBody.appendChild(tr);
+        } else {
+          snapshot.activeAgents.forEach((agent) => {
+            agentBody.appendChild(
+              row([
+                agent.agentId,
+                agent.module,
+                agent.state,
+                agent.traceId || "-"
+              ])
+            );
+          });
+        }
+
+        eventList.innerHTML = "";
+        snapshot.recentEvents.slice(0, 80).forEach((event) => {
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${new Date(event.timestamp).toLocaleTimeString()}</strong> · <strong>${event.module}</strong> · ${event.type} · ${event.message}${event.traceId ? ` · trace=${event.traceId}` : ""}${event.agentId ? ` · agent=${event.agentId}` : ""}`;
+          eventList.appendChild(li);
+        });
+      }
+
+      function startStream() {
+        const stream = new EventSource("/monitor/stream");
+
+        stream.addEventListener("open", () => {
+          connectionStatus.textContent = "Connected";
+        });
+
+        stream.addEventListener("snapshot", (msg) => {
+          const snapshot = JSON.parse(msg.data);
+          renderSnapshot(snapshot);
+        });
+
+        stream.addEventListener("update", (msg) => {
+          const data = JSON.parse(msg.data);
+          renderSnapshot(data.snapshot);
+        });
+
+        stream.addEventListener("heartbeat", () => {
+          connectionStatus.textContent = `Connected · ${new Date().toLocaleTimeString()}`;
+        });
+
+        stream.onerror = () => {
+          connectionStatus.textContent = "Disconnected, retrying...";
+        };
+      }
+
+      async function sendRequest() {
+        requestOutput.textContent = "Sending request...";
+        try {
+          const response = await fetch("http://localhost:8080/orchestrate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: requestMessage.value,
+              confirmed: requestConfirmed.checked
+            })
+          });
+          const body = await response.json();
+          requestOutput.textContent = JSON.stringify(body, null, 2);
+        } catch (error) {
+          requestOutput.textContent = `Request failed: ${String(error)}`;
+        }
+      }
+
+      requestButton.addEventListener("click", sendRequest);
+
+      startStream();
+    </script>
+  </body>
+</html>

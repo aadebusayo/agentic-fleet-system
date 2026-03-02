@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MCPToolDescriptor",
+  "type": "object",
+  "required": ["name", "description", "inputSchema", "accessPolicy"],
+  "properties": {
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "inputSchema": { "type": "object" },
+    "outputSchema": { "type": "object" },
+    "accessPolicy": {
+      "type": "object",
+      "required": ["riskLevel", "requiresConfirmation"],
+      "properties": {
+        "riskLevel": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "requiresConfirmation": { "type": "boolean" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

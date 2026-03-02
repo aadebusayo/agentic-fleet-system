@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "A2AMessage",
+  "type": "object",
+  "required": ["id", "traceId", "sourceAgent", "targetAgent", "kind", "payload", "timestamp"],
+  "properties": {
+    "id": { "type": "string" },
+    "traceId": { "type": "string" },
+    "sourceAgent": { "type": "string" },
+    "targetAgent": { "type": "string" },
+    "kind": { "type": "string", "enum": ["task", "status", "delegation", "memory-sync", "error"] },
+    "payload": { "type": "object" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "ttlSeconds": { "type": "integer", "minimum": 1 }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,20 @@
+{
+  "agentType": "planner",
+  "version": "1.0.0",
+  "capabilities": [
+    {
+      "name": "build-task-graph",
+      "category": "planning",
+      "inputs": ["intent", "slots", "policyContext"],
+      "outputs": ["dag", "riskProfile"],
+      "maxExecutionSeconds": 10
+    },
+    {
+      "name": "route-node",
+      "category": "routing",
+      "inputs": ["node", "fleetState"],
+      "outputs": ["assignment"],
+      "maxExecutionSeconds": 5
+    }
+  ]
+}

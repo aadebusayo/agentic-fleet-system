@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CapabilityManifest",
+  "type": "object",
+  "required": ["agentType", "version", "capabilities"],
+  "properties": {
+    "agentType": { "type": "string" },
+    "version": { "type": "string" },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "category", "inputs", "outputs"],
+        "properties": {
+          "name": { "type": "string" },
+          "category": { "type": "string" },
+          "inputs": { "type": "array", "items": { "type": "string" } },
+          "outputs": { "type": "array", "items": { "type": "string" } },
+          "maxExecutionSeconds": { "type": "integer", "minimum": 1 }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,23 @@
+{
+  "name": "create_ticket",
+  "description": "Create an operational ticket in an external system.",
+  "inputSchema": {
+    "type": "object",
+    "required": ["title", "priority"],
+    "properties": {
+      "title": { "type": "string" },
+      "priority": { "type": "string", "enum": ["low", "medium", "high"] }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": ["ticketId"],
+    "properties": {
+      "ticketId": { "type": "string" }
+    }
+  },
+  "accessPolicy": {
+    "riskLevel": "medium",
+    "requiresConfirmation": true
+  }
+}

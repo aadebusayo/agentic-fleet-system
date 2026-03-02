@@ -1,0 +1,20 @@
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform Init/Plan
+        working-directory: infra/terraform/environments/dev
+        run: |
+          terraform init -backend=false
+          terraform plan -input=false

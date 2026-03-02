@@ -1,0 +1,10 @@
+{
+  "agentId": "fraud-analyzer-01",
+  "agentType": "analysis",
+  "runtime": "go",
+  "capabilityManifestRef": "../../shared/examples/capability-manifest.example.json",
+  "guardrails": {
+    "maxDepth": 2,
+    "maxInvocations": 25
+  }
+}

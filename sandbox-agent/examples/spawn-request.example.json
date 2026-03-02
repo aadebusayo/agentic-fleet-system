@@ -1,0 +1,6 @@
+{
+  "traceId": "trace-001",
+  "agentType": "specialist",
+  "payload": { "task": "summarize checkpoint deltas" },
+  "depth": 1
+}

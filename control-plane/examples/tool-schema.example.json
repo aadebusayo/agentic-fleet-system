@@ -1,0 +1,16 @@
+{
+  "name": "approve_payment",
+  "description": "Approves a high-risk payment operation.",
+  "inputSchema": {
+    "type": "object",
+    "required": ["paymentId", "amount"],
+    "properties": {
+      "paymentId": { "type": "string" },
+      "amount": { "type": "number" }
+    }
+  },
+  "accessPolicy": {
+    "riskLevel": "high",
+    "requiresConfirmation": true
+  }
+}

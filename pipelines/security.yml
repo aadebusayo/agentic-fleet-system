@@ -1,0 +1,29 @@
+name: security
+
+on:
+  workflow_call:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python dependency audit
+        run: |
+          python -m pip install pip-audit
+          cd backend && pip-audit || true
+          cd ../sandbox-agent && pip-audit || true
+      - name: Node dependency audit
+        working-directory: control-plane
+        run: npm ci && npm audit --audit-level=high || true
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .

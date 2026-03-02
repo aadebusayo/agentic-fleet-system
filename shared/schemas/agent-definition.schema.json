@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentDefinition",
+  "type": "object",
+  "required": ["agentId", "agentType", "runtime", "capabilityManifestRef", "guardrails"],
+  "properties": {
+    "agentId": { "type": "string" },
+    "agentType": { "type": "string" },
+    "runtime": { "type": "string", "enum": ["python", "node", "go", "container"] },
+    "capabilityManifestRef": { "type": "string" },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "tenant": { "type": "string" },
+        "roles": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "guardrails": {
+      "type": "object",
+      "required": ["maxDepth", "maxInvocations"],
+      "properties": {
+        "maxDepth": { "type": "integer", "minimum": 1 },
+        "maxInvocations": { "type": "integer", "minimum": 1 }
+      }
+    }
+  },
+  "additionalProperties": false
+}

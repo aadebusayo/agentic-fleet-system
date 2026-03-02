@@ -1,0 +1,14 @@
+{
+  "agentId": "orchestrator-planner-01",
+  "agentType": "planner",
+  "runtime": "python",
+  "capabilityManifestRef": "../examples/capability-manifest.example.json",
+  "identity": {
+    "tenant": "global",
+    "roles": ["planner", "delegator"]
+  },
+  "guardrails": {
+    "maxDepth": 3,
+    "maxInvocations": 40
+  }
+}

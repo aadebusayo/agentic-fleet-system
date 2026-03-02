@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Module Manager</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #0e1117;
+        color: #e7ebf3;
+      }
+      header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #293244;
+        display: flex;
+        justify-content: space-between;
+      }
+      nav a {
+        color: #9ecbff;
+        text-decoration: none;
+        margin-right: 16px;
+        font-size: 13px;
+      }
+      main {
+        padding: 16px 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .panel {
+        border: 1px solid #293244;
+        border-radius: 8px;
+        background: #131a24;
+      }
+      .panel h2 {
+        margin: 0;
+        padding: 12px 14px;
+        border-bottom: 1px solid #293244;
+        font-size: 15px;
+      }
+      .panel .content {
+        padding: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        text-align: left;
+        border-bottom: 1px solid #253041;
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+      pre,
+      textarea,
+      input,
+      button {
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 6px;
+        border: 1px solid #34445d;
+        background: #0f1520;
+        color: #e7ebf3;
+        padding: 10px;
+      }
+      button {
+        width: auto;
+        cursor: pointer;
+        background: #1c2840;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .full {
+        grid-column: 1 / span 2;
+      }
+      .status {
+        font-size: 12px;
+        color: #9fb0c8;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <strong>Chat Module Manager</strong>
+        <nav>
+          <a href="/chat">User Chat</a>
+          <a href="/ops">Ops View</a>
+          <a href="/chat-admin">Chat Module Manager</a>
+        </nav>
+      </div>
+      <div class="status" id="save-status">Idle</div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>Actions</h2>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Handler</th>
+                <th>Enabled</th>
+              </tr>
+            </thead>
+            <tbody id="actions-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Processes</h2>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Trigger</th>
+                <th>Steps</th>
+              </tr>
+            </thead>
+            <tbody id="processes-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel full">
+        <h2>Definition Editor (JSON)</h2>
+        <div class="content">
+          <textarea id="definition-editor" rows="18"></textarea>
+          <div class="actions">
+            <button id="reload-definition">Reload</button>
+            <button id="save-definition">Save Definition</button>
+          </div>
+          <pre id="save-output">No changes yet.</pre>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const actionsBody = document.getElementById("actions-body");
+      const processesBody = document.getElementById("processes-body");
+      const editor = document.getElementById("definition-editor");
+      const saveStatus = document.getElementById("save-status");
+      const saveOutput = document.getElementById("save-output");
+
+      function renderTable(definition) {
+        actionsBody.innerHTML = "";
+        definition.actions.forEach((action) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${action.id}</td><td>${action.name}</td><td>${action.handler}</td><td>${action.enabled}</td>`;
+          actionsBody.appendChild(row);
+        });
+
+        processesBody.innerHTML = "";
+        definition.processes.forEach((process) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${process.id}</td><td>${process.name}</td><td>${process.trigger}</td><td>${process.steps.join(" → ")}</td>`;
+          processesBody.appendChild(row);
+        });
+      }
+
+      async function loadDefinition() {
+        saveStatus.textContent = "Loading...";
+        const response = await fetch("/chat/definitions");
+        const definition = await response.json();
+        editor.value = JSON.stringify(definition, null, 2);
+        renderTable(definition);
+        saveStatus.textContent = "Loaded";
+      }
+
+      async function saveDefinition() {
+        saveStatus.textContent = "Saving...";
+        try {
+          const payload = JSON.parse(editor.value);
+          const response = await fetch("/chat/definitions", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          const body = await response.json();
+          if (!response.ok) {
+            saveOutput.textContent = JSON.stringify(body, null, 2);
+            saveStatus.textContent = "Save failed";
+            return;
+          }
+          saveOutput.textContent = JSON.stringify(body, null, 2);
+          renderTable(body.definition);
+          saveStatus.textContent = "Saved";
+        } catch (error) {
+          saveOutput.textContent = `Invalid JSON: ${String(error)}`;
+          saveStatus.textContent = "Invalid JSON";
+        }
+      }
+
+      document.getElementById("reload-definition").addEventListener("click", loadDefinition);
+      document.getElementById("save-definition").addEventListener("click", saveDefinition);
+
+      loadDefinition();
+    </script>
+  </body>
+</html>
